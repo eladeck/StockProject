@@ -1,9 +1,8 @@
 from django.http import JsonResponse
 from django.test import TestCase, Client
 from django.urls import reverse
-from  myapp.models import Stock
 from django.contrib.auth.models import User
-import json
+
 class BaseTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -19,7 +18,6 @@ class BaseTest(TestCase):
             'email':'alaa.yahia.1995@gmail.com',
             'password':'rails7777',
         }
-        return super().setUp()
 
 class TestViews(BaseTest):
 
@@ -27,21 +25,18 @@ class TestViews(BaseTest):
         response = self.client.get(self.home_url)
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'index.html')
-    #top_rank #title #data?
 
 
     def test_project_single_stock_GET(self):
         response = self.client.get(self.single_stock_url)
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, 'single_stock.html')
-    #title #data
 
 
     def test_project_historic_GET(self):
         response = self.client.get(self.historic_url)
         self.assertEquals(response.status_code, 200)
         self.assertIsInstance(response, JsonResponse)
-    #data
 
 
 class RegisterTest(BaseTest):
@@ -54,21 +49,22 @@ class RegisterTest(BaseTest):
         response=self.client.post(self.register_url,self.user,format='text/html')
         self.assertEqual(response.status_code,302)
 
-   # we don't have a problem with short passwords,  not good!
-   # def test_cant_register_user_withshortpassword(self):
-   #      response=self.client.post(self.register_url,self.user_short_password,format='text/html')
-   #      self.assertEqual(response.status_code,400)
+   """
+   Tests:
+   def test_cant_register_user_withshortpassword(self):
+        response=self.client.post(self.register_url,self.user_short_password,format='text/html')
+        self.assertEqual(response.status_code,400)
 
-   #the system allows invalid emails, not good!
+   
    # def test_cant_register_user_with_invalid_email(self):
    #      response=self.client.post(self.register_url,self.user_invalid_email,format='text/html')
    #      self.assertEqual(response.status_code,400)
 
-   # the page doesn't redirect or give a suitable message! need to be fixed.
+
    # def test_cant_register_user_with_taken_email(self):
    #      self.client.post(self.register_url,self.user,format='text/html')
    #      response=self.client.post(self.register_url,self.user,format='text/html')
-   #      self.assertEqual(response.status_code,400)
+   #      self.assertEqual(response.status_code,400)"""
 
 
 class LoginTest(BaseTest):
@@ -100,8 +96,7 @@ class LogoutTest(BaseTest):
     def test_can_access_page(self):
         response=self.client.get(self.logout_url)
         self.assertEqual(response.status_code,302) #302: should be redirected.
-        # it subbosed to be redirected to homepage,
-        # but  No templates used to render the response, should be fixed.
+        # TODO: issue 4.
         #self.assertTemplateUsed(response,'index.html')
 
     def test_logout_success(self):

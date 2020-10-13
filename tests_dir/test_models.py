@@ -3,6 +3,9 @@ from myapp.models import Stock
 
 
 class StockModelTest(TestCase):
+    SYMBOL_LENGTH = 12
+    NAME_LENGTH = 64
+    PRIMARY_EXCHANGE_LENGTH = 32
 
     @classmethod
     def setUpTestData(cls):
@@ -12,7 +15,7 @@ class StockModelTest(TestCase):
     def test_symbol_length(self):
         stock = Stock.objects.get(symbol='1')
         max_length = stock._meta.get_field('symbol').max_length
-        self.assertEquals(max_length, 12)
+        self.assertEquals(max_length, self.SYMBOL_LENGTH)
 
     def test_symbol_not_none(self):
         stock = Stock.objects.get(symbol='1')
@@ -21,7 +24,7 @@ class StockModelTest(TestCase):
     def test_name_length(self):
         stock = Stock.objects.get(symbol='1')
         max_length = stock._meta.get_field('name').max_length
-        self.assertEquals(max_length, 64)
+        self.assertEquals(max_length, self.NAME_LENGTH)
 
     def test_name_not_none(self):
         stock = Stock.objects.get(symbol='1')
@@ -38,4 +41,4 @@ class StockModelTest(TestCase):
     def test_primary_excahnge_length(self):
         stock = Stock.objects.get(symbol='1')
         max_length = stock._meta.get_field('primary_exchange').max_length
-        self.assertEquals(max_length, 32)
+        self.assertEquals(max_length, self.PRIMARY_EXCHANGE_LENGTH)

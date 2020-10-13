@@ -5,14 +5,16 @@ import random
 
 class StockAPITestCase(TestCase):
     def setUp(self):
-        self.public_token = 'Tpk_c818732500c24764801eb121fa658bb6'
-
+        self.public_token = stock_api.PUBLIC_TOKEN
+        self.base_url = stock_api.BASE_URL
         """
         next 2 lines do this:
         get all stock symbols from the api, choose a random one to use it for testing.
         We could test all of them, but doing thousands of requests for a test does not make sense to me
         """
-        response = requests.get('https://sandbox.iexapis.com/beta/ref-data/symbols?token={}'.format(self.public_token))
+        response = requests.get('{}/beta/ref-data/symbols?token={}'.format(
+            self.base_url,
+            self.public_token))
         self.stock_object = random.choice(response.json())
         # it is also possible to create a static symbol object to use.
 
@@ -35,7 +37,7 @@ class StockAPITestCase(TestCase):
     def test_get_stock_info(self):
         response = stock_api.get_stock_info(self.stock_object['symbol'])
         self.assertIsNotNone(response)
-        self.assertEqual(response['symbol'],self.stock_object['symbol'])
+        self.assertEqual(response['symbol'], self.stock_object['symbol'])
 
         with self.assertRaises(Exception):
             response = stock_api.get_stock_info("")

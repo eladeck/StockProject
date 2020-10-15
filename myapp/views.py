@@ -49,3 +49,8 @@ def logout_view(request):
 def single_stock_historic(request, symbol):
 	data = stock_api.get_stock_historic_prices(symbol, time_range='1m')
 	return JsonResponse({'data': data})
+
+
+def single_stock_estimates(request, symbol):
+	data = stock_api.get_stock_estimates(symbol)
+	return render(request, 'single_stock_estimates.html', {'page_title': 'Stock Estimates - %s' % symbol, 'data': data})

@@ -49,3 +49,10 @@ def logout_view(request):
 def single_stock_historic(request, symbol):
 	data = stock_api.get_stock_historic_prices(symbol, time_range='1m')
 	return JsonResponse({'data': data})
+
+
+
+# API for Earnings data for a given company
+def single_stock_earning(request, symbol):
+    data = stock_api.get_stock_earning(symbol, last=1)
+    return JsonResponse({'data': data})

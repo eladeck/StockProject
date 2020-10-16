@@ -38,6 +38,8 @@ def register(request):
 		return render(request, 'register.html', {'page_title': 'Register'})
 
 
+
+
 def logout_view(request):
 	logout(request)
 	return redirect('index')
@@ -56,3 +58,7 @@ def single_stock_historic(request, symbol):
 def single_stock_earning(request, symbol):
     data = stock_api.get_stock_earning(symbol, last=1)
     return JsonResponse({'data': data})
+
+
+def compare(request):
+	return render(request,'compare_two_stocks.html')

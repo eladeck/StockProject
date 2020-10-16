@@ -47,3 +47,10 @@ def get_stock_info(symbol):
 
 def get_stock_historic_prices(symbol, time_range='1m'):
 	return _request_data('/stable/stock/{symbol}/chart/{time_range}'.format(symbol=symbol, time_range=time_range))
+
+
+
+def get_stock_earning(symbol, last):
+    return _request_data('/stable/stock/{symbol}/earnings/{last}'.format(symbol=symbol, last=last),
+                         filter='actualEPS,consensusEPS,announceTime,numberOfEstimates,EPSSurpriseDollar,yearAgoChangePercent,currency',
+                         additional_parameters={'period': 'qurter'})

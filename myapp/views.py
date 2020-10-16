@@ -52,5 +52,10 @@ def single_stock_historic(request, symbol):
 
 
 def single_stock_estimates(request, symbol):
+	# Note: in the estimates request I don't get the company name so I got it from
+	# the stock info. Is this Ok?
+	company_name = stock_api.get_stock_info(symbol)['companyName']
 	data = stock_api.get_stock_estimates(symbol)
-	return render(request, 'single_stock_estimates.html', {'page_title': 'Stock Estimates - %s' % symbol, 'data': data})
+	return render(request, 'single_stock_estimates.html',
+				  {'page_title': 'Stock Estimates - %s' % symbol,
+				   'symbol': symbol,'CompanyName':company_name, 'data': data['estimates'][0]})

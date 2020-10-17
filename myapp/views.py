@@ -54,5 +54,8 @@ def single_stock_historic(request, symbol):
 
 # API for Earnings data for a given company
 def single_stock_earning(request, symbol):
-    data = stock_api.get_stock_earning(symbol, last=1)
-    return JsonResponse({'data': data})
+	data = stock_api.get_stock_earning(symbol, last=1)
+	companyName = stock_api.get_stock_info(symbol)['companyName']
+	return render(request, 'earning_stock.html', {'page_title': 'Earning Page - %s' % symbol ,'data': data
+												  , 'companyName' :companyName} ,
+				  )

@@ -52,5 +52,6 @@ def get_stock_historic_prices(symbol, time_range='1m'):
 
 def get_stock_earning(symbol, last):
     return _request_data('/stable/stock/{symbol}/earnings/{last}'.format(symbol=symbol, last=last),
-                         filter='actualEPS,consensusEPS,announceTime,numberOfEstimates,EPSSurpriseDollar,yearAgoChangePercent,currency',
-                         additional_parameters={'period': 'qurter'})
+						 filter='symbol,actualEPS,consensusEPS,announceTime,numberOfEstimates,EPSSurpriseDollar,' +
+								'EPSReportDate,fiscalPeriod,fiscalEndDate,yearAgo,yearAgoChangePercent,currency',
+                              additional_parameters={'period': 'quarter'})

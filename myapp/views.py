@@ -55,13 +55,6 @@ def single_stock_historic(request, symbol):
 	return JsonResponse({'data': data})
 
 
-
-# API for Earnings data for a given company
-def single_stock_earning(request, symbol):
-    data = stock_api.get_stock_earning(symbol, last=1)
-    return JsonResponse({'data': data})
-
-
 def compare(request):
     stock_list = stock_api.get_all_stocks()
     data = {'stock_list': stock_list,

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="col-md-12 text-left">
+		<h2 class="display-4">
+				<small class="text-muted">({{ data.symbol }})</small>
+		</h2>
+</div>
+
+
+<div class="row">
+    <div class="col-10 ">
+        {% for attribute in data.estimates %}
+        {% for key,val in attribute.items %}
+        <div class="row">
+            <div class="col-4 text-left"><span class="font-weight-bold  text-muted">{{key}}</span></div>
+            <div class="col-4 text-left"><span class="ml-3 text-black text-left">{{val}}</span></div>
+        </div>
+        {% endfor %}
+		{% endfor %}
+    </div>
+</div>
+{% endblock %}

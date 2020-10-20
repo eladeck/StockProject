@@ -50,4 +50,4 @@ def get_stock_historic_prices(symbol, time_range='1m'):
 
 
 def get_stock_estimates(symbol):
-	return _request_data('/stable/stock/{symbol}/estimates'.format(symbol=symbol))
+	return _request_data(f"/stable/stock/{symbol}/estimates")

@@ -1,11 +1,104 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div>
+    <div>
 
-<select name="stock_selector" id="stock_selector">
-    <option value="hello" >Hello</option>
-</select>
+        <select name="stock_selector1" id="stock_selector1" onchange="draw_figure()">
+            {% for stock in  stock_list %}
+                <option value="{{ stock.symbol }}">{{ stock.symbol }}</option>
+            {% endfor %}
+        </select>
 
-</div>
+        <select name="stock_selector2" id="stock_selector2" onchange="draw_figure()">
+            {% for stock in  stock_list %}
+                <option value="{{ stock.symbol }}">{{ stock.symbol }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <canvas id="stockChart"></canvas>
+    </div>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+    <script>
+        var myLineChart;
+        $(document).ready(function () {
+            draw_figure()
+        });
+
+
+        function draw_figure() {
+
+            if (myLineChart != null){
+                myLineChart.destroy()
+            }
+
+
+
+            let selector1_value = $("#stock_selector1").find(":selected").text();
+            let selector2_value = $("#stock_selector2").find(":selected").text();
+            let url1 = "/historic/" + selector1_value;
+            let url2 = "/historic/" + selector2_value;
+
+            $.get(
+                url1,
+                function (data) {
+                    historic_data1 = data.data.sort(function (a, b) {
+                        return a.date - b.date;
+                    });
+
+                    $.get(url2, function (data) {
+                        historic_data2 = data.data.sort(function (a, b) {
+                            return a.date - b.date;
+                        });
+
+                        var ctxL = document.getElementById("stockChart").getContext('2d');
+                        myLineChart = new Chart(ctxL, {
+                            type: 'line',
+                            data: {
+                                labels: historic_data1.map(d => d.label),
+                                datasets: [
+                                    {
+                                        label: selector1_value,
+                                        data: historic_data1.map(d => d.close),
+                                        backgroundColor: [
+                                            'rgba(105, 60, 50, .2)',
+                                        ],
+                                        borderColor: [
+                                            'rgba(200, 50, 200, .7)',
+                                        ],
+                                        borderWidth: 2
+                                    }
+                                    ,
+                                    {
+                                        label: selector2_value,
+                                        data: historic_data2.map(d => d.close),
+                                        backgroundColor: [
+                                            'rgba(105, 0, 132, .2)',
+                                        ],
+                                        borderColor: [
+                                            'rgba(300, 99, 0, .7)',
+                                        ],
+                                        borderWidth: 2
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true
+                            }
+
+                        });
+
+
+                    });
+
+
+                });
+        }
+    </script>
 {% endblock %}

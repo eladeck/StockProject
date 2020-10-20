@@ -12,6 +12,7 @@ class BaseTest(TestCase):
         self.register_url = reverse('register')
         self.login_url = reverse('login')
         self.logout_url = reverse('logout')
+        self.compare_url = reverse('compare')
         self.user={
             'firstname': 'Alaa',
             'lastname': 'Yahia',
@@ -37,6 +38,11 @@ class TestViews(BaseTest):
         response = self.client.get(self.historic_url)
         self.assertEquals(response.status_code, 200)
         self.assertIsInstance(response, JsonResponse)
+
+    def test_compare(self):
+        response = self.client.get(self.compare_url)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'compare_two_stocks.html')
 
 
 class RegisterTest(BaseTest):

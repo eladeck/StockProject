@@ -12,12 +12,18 @@ class BaseTest(TestCase):
         self.register_url = reverse('register')
         self.login_url = reverse('login')
         self.logout_url = reverse('logout')
+        self.estimates_url = reverse('estimates')
         self.user={
             'firstname': 'Alaa',
             'lastname': 'Yahia',
             'email':'alaa.yahia.1995@gmail.com',
             'password':'rails7777',
         }
+
+    def test_estimates(self):
+        response = self.client.get(self.estimates_url)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'single_stock_estimates.html')
 
 class TestViews(BaseTest):
 

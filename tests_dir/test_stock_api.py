@@ -47,3 +47,8 @@ class StockAPITestCase(TestCase):
         self.assertIsNotNone(response)
         with self.assertRaises(Exception):
             response = stock_api.get_stock_historic_prices("")
+
+    def test_single_stock_earning(self):
+        response = stock_api.get_stock_earning(self.stock_object['symbol'],1)
+        self.assertIsNotNone(response)
+        self.assertEqual(response['symbol'], self.stock_object['symbol'],1)

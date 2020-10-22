@@ -12,6 +12,7 @@ class BaseTest(TestCase):
         self.register_url = reverse('register')
         self.login_url = reverse('login')
         self.logout_url = reverse('logout')
+        self.single_stock_earning_url = reverse('single_stock_earning', args=['AAPL'])
         self.user={
             'firstname': 'Alaa',
             'lastname': 'Yahia',
@@ -38,6 +39,10 @@ class TestViews(BaseTest):
         self.assertEquals(response.status_code, 200)
         self.assertIsInstance(response, JsonResponse)
 
+    def test_single_stock_earning_GET(self):
+        response = self.client.get(self.single_stock_earning_url)
+        self.assertEquals(response.status_code, 200)
+        self.assertTemplateUsed(response, 'earning_stock.html')
 
 class RegisterTest(BaseTest):
    def test_can_view_page_correctly(self):

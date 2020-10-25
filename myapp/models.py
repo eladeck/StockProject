@@ -20,15 +20,14 @@ class Stock(models.Model):
 class UserProfile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	balance = models.FloatField()
-	stocks_num = models.IntegerField()
+	stocks_num = models.IntegerField(default=0)
 
 
 class Transaction(models.Model):
 	#trans_id (Pk) - comes by Django
 	user_id = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
-	stock_id = models.ForeignKey(Stock, on_delete=models.CASCADE)
+	stock_symbol = models.CharField(max_length=12, primary_key=True)
 	trans_date = models.DateField()
 	buy_or_Sell = models.IntegerField()
 	quantity = models.IntegerField()
 	price = models.FloatField()
-	new_balance = models.FloatField()

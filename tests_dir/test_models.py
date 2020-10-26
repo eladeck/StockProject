@@ -51,8 +51,6 @@ class TransactionModelTest(BaseTest):
         self.assertEquals(3.5, transaction.price)
 
 
-
-
 class UserProfileModelTest(BaseTest):
 
     def test_user_not_None(self):

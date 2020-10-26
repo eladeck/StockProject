@@ -1,4 +1,8 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+SELL = 0
+BUY = 1
 
 
 # Create your models here.
@@ -11,3 +15,19 @@ class Stock(models.Model):
 	change_percent = models.FloatField()
 	market_cap = models.FloatField(null=True)
 	primary_exchange = models.CharField(null=True, max_length=32)
+
+
+class UserProfile(models.Model):
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	balance = models.FloatField()
+	stocks_num = models.IntegerField(default=0)
+
+
+class Transaction(models.Model):
+	#trans_id (Pk) - comes by Django
+	user_id = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
+	stock_symbol = models.CharField(max_length=12, primary_key=True)
+	trans_date = models.DateField()
+	buy_or_Sell = models.IntegerField()
+	quantity = models.IntegerField()
+	price = models.FloatField()

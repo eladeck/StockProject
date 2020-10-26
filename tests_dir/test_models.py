@@ -15,12 +15,42 @@ class BaseTest(TestCase):
         Stock.objects.create(symbol='1', name='test_stock', price=3.5, change_percent=5, )
         user = User.objects.create_user('Alaa', 'Yahia', 'alaa.yahia.1995@gmail.com')
         UserProfile.objects.create(user=user, balance=500)
-        Transaction.objects.create(stock_symbol=Stock.symbol, trans_date=datetime.datetime.now(),
-                                   buy_or_Sell=1, quantity=3, price=3.5)
+        Transaction.objects.create(user_id= UserProfile.objects.get(user=user),
+                                   stock_symbol=Stock.objects.get(symbol='1').symbol, trans_date=datetime.datetime.now(),
+                                   buy_or_Sell=1, quantity=3, price=Stock.objects.get(symbol='1').price)
 
 
 class TransactionModelTest(BaseTest):
-    pass
+
+    def test_transaction_not_None(self):
+        transaction = Transaction.objects.get()
+        self.assertIsNotNone(transaction.user_id)
+
+    def test_user_id(self):
+        transaction = Transaction.objects.get()
+        self.assertEquals('Alaa', transaction.user_id.user.username)
+
+    def test_stock_symbol(self):
+        transaction = Transaction.objects.get()
+        self.assertEquals('1', transaction.stock_symbol)
+
+    def test_trans_date(self):
+        transaction = Transaction.objects.get()
+        self.assertIsNotNone(transaction.trans_date)
+
+    def test_buy_or_Sell(self):
+        transaction = Transaction.objects.get()
+        self.assertEquals(1, transaction.buy_or_Sell)
+
+    def test_quantity(self):
+        transaction = Transaction.objects.get()
+        self.assertEquals(3, transaction.quantity)
+
+    def test_price(self):
+        transaction = Transaction.objects.get()
+        self.assertEquals(3.5, transaction.price)
+
+
 
 
 class UserProfileModelTest(BaseTest):

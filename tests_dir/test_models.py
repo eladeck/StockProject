@@ -1,8 +1,10 @@
 from django.test import TestCase
-from myapp.models import Stock
+from myapp.models import Stock, UserProfile, Transaction
+import datetime
+from django.contrib.auth.models import User
 
 
-class StockModelTest(TestCase):
+class BaseTest(TestCase):
     SYMBOL_LENGTH = 12
     NAME_LENGTH = 64
     PRIMARY_EXCHANGE_LENGTH = 32
@@ -11,6 +13,36 @@ class StockModelTest(TestCase):
     def setUpTestData(cls):
         # Set up non-modified objects used by all test methods
         Stock.objects.create(symbol='1', name='test_stock', price=3.5, change_percent=5, )
+        user = User.objects.create_user('Alaa', 'Yahia', 'alaa.yahia.1995@gmail.com')
+        UserProfile.objects.create(user=user, balance=500)
+        Transaction.objects.create(stock_symbol=Stock.symbol, trans_date=datetime.datetime.now(),
+                                   buy_or_Sell=1, quantity=3, price=3.5)
+
+
+class TransactionModelTest(BaseTest):
+    pass
+
+
+class UserProfileModelTest(BaseTest):
+
+    def test_user_not_None(self):
+        user_profile = UserProfile.objects.get()
+        self.assertIsNotNone(user_profile.user)
+
+    def test_user_username(self):
+        user_profile = UserProfile.objects.get()
+        self.assertEquals('Alaa', user_profile.user.username)
+
+    def test_user_plance(self):
+        user_profile = UserProfile.objects.get()
+        self.assertEquals(500, user_profile.balance)
+
+    def test_stocks_num(self):
+        user_profile = UserProfile.objects.get()
+        self.assertEquals(0, user_profile.stocks_num)
+
+
+class StockModelTest(BaseTest):
 
     def test_symbol_length(self):
         stock = Stock.objects.get(symbol='1')

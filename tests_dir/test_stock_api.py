@@ -3,6 +3,7 @@ from myapp import stock_api
 import requests
 import random
 
+
 class StockAPITestCase(TestCase):
     def setUp(self):
         self.public_token = stock_api.PUBLIC_TOKEN

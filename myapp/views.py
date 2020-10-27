@@ -10,7 +10,7 @@ from django.contrib.auth import logout
 def index(request):
 	# Query the stock table, filter for top ranked stocks and order by their rank.
 	data = Stock.objects.filter(top_rank__isnull=False).order_by('top_rank')
-	return render(request, 'index.html', {'page_title': 'Main', 'data': data })
+	return render(request, 'index.html', {'page_title': 'Main', 'data': data})
 
 
 # View for the single stock page
@@ -23,15 +23,15 @@ def single_stock(request, symbol):
 def register(request):
 	# If post -> register the user and redirect to main page
 	if request.method == 'POST':
-		firstname = request.POST.get('firstname')
-		lastname = request.POST.get('lastname')
+		first_name = request.POST.get('firstname')
+		last_name = request.POST.get('lastname')
 		email = request.POST.get('email')
 		password = request.POST.get('password')
 
-		newuser = User.objects.create_user(username=email, email=email, password=password)
-		newuser.first_name = firstname
-		newuser.last_name = lastname
-		newuser.save()
+		new_user = User.objects.create_user(username=email, email=email, password=password)
+		new_user.first_name = first_name
+		new_user.last_name = last_name
+		new_user.save()
 		return redirect('index')
 	else:
 		# If not post (regular request) -> render register page
@@ -49,3 +49,7 @@ def logout_view(request):
 def single_stock_historic(request, symbol):
 	data = stock_api.get_stock_historic_prices(symbol, time_range='1m')
 	return JsonResponse({'data': data})
+
+
+def get_current_user(request):
+	return request.user

@@ -16,8 +16,9 @@ class BaseTest(TestCase):
         user = User.objects.create_user('Alaa', 'Yahia', 'alaa.yahia.1995@gmail.com')
         UserProfile.objects.create(user=user, balance=500)
         Transaction.objects.create(user_id= UserProfile.objects.get(user=user),
-                                   stock_symbol=Stock.objects.get(symbol='1').symbol, trans_date=datetime.datetime.now(),
-                                   buy_or_Sell=1, quantity=3, price=Stock.objects.get(symbol='1').price)
+                                   stock_symbol=Stock.objects.get(symbol='1').symbol,
+                                   trans_date=datetime.datetime.now(), buy_or_Sell=1, quantity=3,
+                                   price=Stock.objects.get(symbol='1').price)
 
 
 class TransactionModelTest(BaseTest):

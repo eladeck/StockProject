@@ -1,9 +1,11 @@
+import requests
 from django.shortcuts import render, redirect
 from myapp import stock_api
 from myapp.models import Stock
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
+from . import stock_api
 
 
 # View for the home page - a list of 20 of the most active stocks
@@ -54,3 +56,10 @@ def trade(request):
 	content = {'user':request.user}
 	rendered_page = render(request, 'trade.html', content)
 	return rendered_page
+
+
+def compare(request):
+    stock_list = stock_api.get_all_stocks()
+    data = {'stock_list': stock_list,
+            }
+    return render(request, 'compare_two_stocks.html', data)

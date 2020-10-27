@@ -49,3 +49,8 @@ def logout_view(request):
 def single_stock_historic(request, symbol):
 	data = stock_api.get_stock_historic_prices(symbol, time_range='1m')
 	return JsonResponse({'data': data})
+
+def trade(request):
+	content = {'user':request.user}
+	rendered_page = render(request, 'trade.html', content)
+	return rendered_page

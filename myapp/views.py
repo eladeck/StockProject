@@ -1,9 +1,11 @@
+import requests
 from django.shortcuts import render, redirect
 from myapp import stock_api
 from myapp.models import Stock
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
+from . import stock_api
 
 
 # View for the home page - a list of 20 of the most active stocks
@@ -38,6 +40,8 @@ def register(request):
 		return render(request, 'register.html', {'page_title': 'Register'})
 
 
+
+
 def logout_view(request):
 	logout(request)
 	return redirect('index')
@@ -49,3 +53,10 @@ def logout_view(request):
 def single_stock_historic(request, symbol):
 	data = stock_api.get_stock_historic_prices(symbol, time_range='1m')
 	return JsonResponse({'data': data})
+
+
+def compare(request):
+    stock_list = stock_api.get_all_stocks()
+    data = {'stock_list': stock_list,
+            }
+    return render(request, 'compare_two_stocks.html', data)

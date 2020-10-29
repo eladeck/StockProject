@@ -4,8 +4,8 @@ from jsonfield import JSONField
 
 
 
-SELL = 0
-BUY = 1
+SELL = 1
+BUY = 0
 
 
 # Create your models here.

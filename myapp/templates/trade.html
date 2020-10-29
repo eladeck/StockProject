@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+
+
+    <form action="/trade" method="get">
+        <label for="stock_selector">Stock Symbol</label>
+        <select name="stock_selector" id="stock_selector">
+            {% for stock in  stock_list %}
+                <option value="{{ stock.symbol }}">{{ stock.symbol }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="number_of_stocks">Number of Stocks</label>
+        <input type="text" id="number_of_stocks" name="number_of_stocks"><br>
+        <input type="submit" id="buy" name="buy" value="Buy">
+        <input type="submit" id="sell" name="sell" value="Sell">
+    </form>
+
+    {% if success %}
+        <p>Done! {{ success }}</p>
+    {% endif %}
+    {% if error %}
+        <p>error! {{ error }}</p>
+    {% endif %}
+
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

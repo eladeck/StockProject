@@ -3,11 +3,6 @@ from django.contrib.auth.models import User
 from datetime import datetime
 
 
-
-SELL = 1
-BUY = 0
-
-
 # Create your models here.
 class Stock(models.Model):
 	symbol = models.CharField(max_length=12, primary_key=True)

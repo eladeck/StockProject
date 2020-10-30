@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from jsonfield import JSONField
+from datetime import datetime
 
 
 
@@ -23,13 +23,11 @@ class Stock(models.Model):
 class UserProfile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	balance = models.FloatField()
-	stocks = JSONField(default=dict())
 
 class Transaction(models.Model):
 	#trans_id (Pk) - comes by Django
-	user_id = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
+	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 	stock_symbol = models.CharField(max_length=12)
-	trans_date = models.DateTimeField()
-	buy_or_sell = models.IntegerField()
+	trans_date_time = models.DateTimeField(default=datetime.utcnow())
 	quantity = models.IntegerField()
 	price = models.FloatField()

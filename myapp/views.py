@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout
 from . import stock_api, models
 from datetime import datetime
+from myapp.logic import trade_logic
 
 
 # View for the home page - a list of 20 of the most active stocks
@@ -61,77 +62,8 @@ def single_stock_historic(request, symbol):
 
 @login_required
 def trade(request):
-    content = {'user': request.user}
     stock_list = stock_api.get_all_stocks()
-    content.update({'stock_list': stock_list})
-
-    params = request.GET
-    user = request.user
-    if "buy" in params or "sell" in params:
-        user_profile = models.UserProfile.objects.get(user=user)
-        if user.is_authenticated:
-
-            try:
-                print(int(params['number_of_stocks']))
-                print(int(params['number_of_stocks'][0]))
-                number_of_stocks = int(params["number_of_stocks"][0])
-                if number_of_stocks <= 0:
-                    raise Exception
-                stock_info = stock_api.get_stock_info(params["stock_selector"])
-                stock_price = float(stock_info['latestPrice'])
-            except Exception:
-                content.update({"error": "Error in input data"})
-                return render(request, 'trade.html', content)
-
-            stock_symbol = stock_info["symbol"]
-            price = stock_price * number_of_stocks
-            if 'buy' in params:
-                if user_profile.balance >= stock_price * number_of_stocks:
-                    t = models.Transaction.objects.create(user_id=models.UserProfile.objects.get(user=request.user),
-                                                          stock_symbol=stock_symbol,
-                                                          trans_date=datetime.now(),
-                                                          buy_or_sell=0,
-                                                          quantity=number_of_stocks,
-                                                          price=price)
-                    t.save()
-                    user_profile.balance -= price
-                    if stock_symbol in user_profile.stocks:
-                        user_profile.stocks[stock_symbol] += number_of_stocks
-                    else:
-                        user_profile.stocks[stock_symbol] = number_of_stocks
-                    user_profile.save()
-                    content.update({'success': f'You have bought {number_of_stocks} {stock_symbol} for a price {price}'
-                                               f'\n your current balance is: {user_profile.balance}'})
-
-                else:
-                    content.update({"error": "not enough balance"})
-                    return render(request, 'trade.html', content)
-
-            elif 'sell' in params:
-                available_stocks = models.UserProfile.objects.get(user=request.user).stocks[stock_symbol]
-                if available_stocks >= number_of_stocks:
-                    t = models.Transaction.objects.create(user_id=models.UserProfile.objects.get(user=request.user),
-                                                          stock_symbol=stock_symbol,
-                                                          trans_date=datetime.now(),
-                                                          buy_or_sell=1,
-                                                          quantity=number_of_stocks,
-                                                          price=price)
-                    t.save()
-
-                    user_profile.stocks[stock_symbol] -= number_of_stocks
-
-                    user_profile.save()
-
-                    content.update({'success': f'You have sold {number_of_stocks} for a price {price}'
-                                               f'\n your current balance is: {user_profile.balance}'})
-                else:
-                    content.update({"error": "not enough stocks"})
-        else:
-            return redirect('login')
-
-
-
-
+    content = {'stock_list': stock_list}
     rendered_page = render(request, 'trade.html', content)
     return rendered_page
 
@@ -141,3 +73,75 @@ def compare(request):
     data = {'stock_list': stock_list,
             }
     return render(request, 'compare_two_stocks.html', data)
+
+
+def buy(request):
+    content = {}
+    stock_list = stock_api.get_all_stocks()
+    content.update({'stock_list': stock_list})
+    params = request.GET
+    user = request.user
+
+    stock_info = trade_logic.parse_input(params)
+
+    if stock_info is None:
+        content.update({"error": "Invalid input"})
+        return render(request, 'trade.html', content)
+
+    if not models.UserProfile.objects.filter(user=user).exists():
+        trade_logic.create_profile(user)
+
+    user_profile = models.UserProfile.objects.get(user=user)
+
+    if stock_info['total_price'] > user_profile.balance:
+        content.update({"error": "not enough balance"})
+        return render(request, 'trade.html', content)
+
+    user_profile.balance -= stock_info['total_price']
+    user_profile.save()
+
+    trade_logic.create_transaction(user, stock_info)
+
+    content.update({'success': f'You have bought {stock_info["number_of_stocks"]} {stock_info["symbol"]} '
+                               f'for a price {stock_info["total_price"]}'
+                               f'\n your current balance is: {user_profile.balance}'})
+
+    return render(request,'trade.html',content)
+
+
+def sell(request):
+    content = {}
+    stock_list = stock_api.get_all_stocks()
+    content.update({'stock_list': stock_list})
+    params = request.GET
+    user = request.user
+
+    stock_info = trade_logic.parse_input(params)
+
+    if stock_info is None:
+        content.update({"error": "Invalid input"})
+        return render(request, 'trade.html', content)
+
+    if not models.UserProfile.objects.filter(user=user).exists():
+        trade_logic.create_profile(user)
+
+    user_profile = models.UserProfile.objects.get(user=user)
+
+    available_stocks = trade_logic.get_number_of_stocks(user, stock_info['symbol'])
+    if available_stocks < stock_info['number_of_stocks']:
+        content.update({"error": "Not enough stocks to sell"})
+        return render(request, 'trade.html', content)
+
+    user_profile.balance += stock_info['total_price']
+    user_profile.save()
+
+    stock_info['number_of_stocks'] *= -1
+    trade_logic.create_transaction(user, stock_info)
+
+    content.update({'success': f'You have sold {abs(stock_info["number_of_stocks"])} {stock_info["symbol"]} '
+                               f'for a price {stock_info["total_price"]}'
+                               f'\n your current balance is: {user_profile.balance}'})
+
+
+
+    return render(request, 'trade.html', content)

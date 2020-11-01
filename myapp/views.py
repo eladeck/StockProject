@@ -74,7 +74,7 @@ def compare(request):
             }
     return render(request, 'compare_two_stocks.html', data)
 
-
+@login_required
 def buy(request):
     content = {}
     stock_list = stock_api.get_all_stocks()
@@ -108,7 +108,7 @@ def buy(request):
 
     return render(request,'trade.html',content)
 
-
+@login_required
 def sell(request):
     content = {}
     stock_list = stock_api.get_all_stocks()

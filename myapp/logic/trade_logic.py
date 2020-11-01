@@ -9,8 +9,11 @@ def parse_input(params):
         stock_info = stock_api.get_stock_info(params["stock_selector"])
         stock_price = float(stock_info['latestPrice'])
         total_price = stock_price * number_of_stocks
-        stock_info.update({'number_of_stocks': number_of_stocks,
-                           'total_price': total_price})
+        stock_info = {'symbol': params["stock_selector"],
+                      'total_price': total_price,
+                      'number_of_stocks': number_of_stocks,
+                      'price': stock_price}
+
         return stock_info
     except Exception:
         return None
@@ -19,7 +22,7 @@ def create_transaction(user, stock_info):
     t = models.Transaction.objects.create(user=user,
                                           stock_symbol=stock_info['symbol'],
                                           quantity=stock_info['number_of_stocks'],
-                                          price=stock_info['total_price'])
+                                          price=stock_info['price'])
     t.save()
 
 def create_profile(user):

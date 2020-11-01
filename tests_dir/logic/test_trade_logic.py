@@ -33,7 +33,8 @@ class TestTradeLogic(TestCase):
         stock_info = {
             'symbol':'A',
             'number_of_stocks': 10,
-            'total_price': 30.0
+            'total_price': 30.0,
+            'price': 3.0
         }
 
         trade_logic.create_transaction(user=self.user,stock_info=stock_info)
@@ -50,14 +51,16 @@ class TestTradeLogic(TestCase):
         stock_info = {
             'symbol': 'A',
             'number_of_stocks': 10,
-            'total_price': 30.0
+            'total_price': 30.0,
+            'price': 3.0
         }
         trade_logic.create_transaction(user=self.user, stock_info=stock_info)
 
         stock_info = {
             'symbol': 'A',
             'number_of_stocks': -5,
-            'total_price': 30.0
+            'total_price': 30.0,
+            'price': 3.0
         }
         trade_logic.create_transaction(user=self.user, stock_info=stock_info)
 

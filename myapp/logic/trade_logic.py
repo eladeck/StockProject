@@ -1,7 +1,7 @@
 from myapp import stock_api
 from myapp import models
 
-def parse_input(params):
+def extract_info(params):
     try:
         number_of_stocks = int(params["number_of_stocks"])
         if number_of_stocks <= 0:
@@ -25,9 +25,6 @@ def create_transaction(user, stock_info):
                                           price=stock_info['price'])
     t.save()
 
-def create_profile(user):
-    profile = models.UserProfile.objects.create(user=user, balance=5000)
-    profile.save()
 
 def get_number_of_stocks(user,stock_symbol):
     transactions = models.Transaction.objects.filter(user=user,stock_symbol=stock_symbol)

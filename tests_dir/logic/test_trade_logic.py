@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from myapp import models
 from myapp.logic import trade_logic
-import requests
+
 
 
 class TestTradeLogic(TestCase):
@@ -17,7 +17,7 @@ class TestTradeLogic(TestCase):
             'number_of_stocks': 10,
             'stock_selector': 'A'
         }
-        stock_info = trade_logic.parse_input(params)
+        stock_info = trade_logic.extract_info(params)
         self.assertIsNotNone(stock_info['number_of_stocks'])
         self.assertIsNotNone(stock_info['total_price'])
 
@@ -26,7 +26,7 @@ class TestTradeLogic(TestCase):
             'number_of_stocks': 'a',
             'stock_selector': 'A'
         }
-        stock_info = trade_logic.parse_input(params)
+        stock_info = trade_logic.extract_info(params)
         self.assertIsNone(stock_info)
 
     def test_create_transaction(self):
@@ -40,11 +40,6 @@ class TestTradeLogic(TestCase):
         trade_logic.create_transaction(user=self.user,stock_info=stock_info)
 
         does_exist = models.Transaction.objects.filter(user=self.user).exists()
-        self.assertTrue(does_exist)
-
-    def test_create_profile(self):
-        trade_logic.create_profile(self.user)
-        does_exist = models.UserProfile.objects.filter(user=self.user).exists()
         self.assertTrue(does_exist)
 
     def test_get_number_of_stocks(self):

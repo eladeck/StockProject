@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout
 from . import stock_api, models
 from datetime import datetime
-from myapp.logic import trade_logic
+from myapp.logic import trade_logic,register_logic
+from django.views.decorators.csrf import csrf_exempt
 
 
 # View for the home page - a list of 20 of the most active stocks
@@ -38,8 +39,7 @@ def register(request):
         newuser.last_name = lastname
         newuser.save()
 
-        user_profile = models.UserProfile.objects.create(user=newuser, balance=5000)
-        user_profile.save()
+        register_logic.create_profile(newuser)
 
         return redirect('index')
     else:
@@ -60,6 +60,13 @@ def single_stock_historic(request, symbol):
     return JsonResponse({'data': data})
 
 
+def compare(request):
+    stock_list = stock_api.get_all_stocks()
+    data = {'stock_list': stock_list,
+            }
+    return render(request, 'compare_two_stocks.html', data)
+
+
 @login_required
 def trade(request):
     stock_list = stock_api.get_all_stocks()
@@ -68,80 +75,70 @@ def trade(request):
     return rendered_page
 
 
-def compare(request):
-    stock_list = stock_api.get_all_stocks()
-    data = {'stock_list': stock_list,
-            }
-    return render(request, 'compare_two_stocks.html', data)
-
 @login_required
+@csrf_exempt
 def buy(request):
-    content = {}
     stock_list = stock_api.get_all_stocks()
-    content.update({'stock_list': stock_list})
-    params = request.GET
-    user = request.user
+    context = {'stock_list': stock_list}
+    if request.method == 'POST':
+        params = request.POST
 
-    stock_info = trade_logic.parse_input(params)
+        stock_info = trade_logic.extract_info(params)
 
-    if stock_info is None:
-        content.update({"error": "Invalid input"})
-        return render(request, 'trade.html', content)
+        if stock_info is None:
+            context.update({"error": "Invalid input"})
+            return render(request, 'trade.html', context)
 
-    if not models.UserProfile.objects.filter(user=user).exists():
-        trade_logic.create_profile(user)
+        user_profile = models.UserProfile.objects.get(user=request.user)
 
-    user_profile = models.UserProfile.objects.get(user=user)
+        if stock_info['total_price'] > user_profile.balance:
+            context.update({"error": "not enough balance"})
+            return render(request, 'trade.html', context)
 
-    if stock_info['total_price'] > user_profile.balance:
-        content.update({"error": "not enough balance"})
-        return render(request, 'trade.html', content)
+        user_profile.balance -= stock_info['total_price']
+        user_profile.save()
 
-    user_profile.balance -= stock_info['total_price']
-    user_profile.save()
+        trade_logic.create_transaction(request.user, stock_info)
 
-    trade_logic.create_transaction(user, stock_info)
+        context.update({'success': f'You have bought {stock_info["number_of_stocks"]} {stock_info["symbol"]} '
+                                   f'for a price {stock_info["total_price"]}'
+                                   f'\n your current balance is: {user_profile.balance}'})
 
-    content.update({'success': f'You have bought {stock_info["number_of_stocks"]} {stock_info["symbol"]} '
-                               f'for a price {stock_info["total_price"]}'
-                               f'\n your current balance is: {user_profile.balance}'})
+        return render(request, 'trade.html', context)
 
-    return render(request,'trade.html',content)
+    return render(request, 'trade.html', context)
 
 @login_required
+@csrf_exempt
 def sell(request):
-    content = {}
+
     stock_list = stock_api.get_all_stocks()
-    content.update({'stock_list': stock_list})
-    params = request.GET
-    user = request.user
+    context = {'stock_list': stock_list}
+    if request.method == 'POST':
+        params = request.POST
+        stock_info = trade_logic.extract_info(params)
 
-    stock_info = trade_logic.parse_input(params)
+        if stock_info is None:
+            context.update({"error": "Invalid input"})
+            return render(request, 'trade.html', context)
 
-    if stock_info is None:
-        content.update({"error": "Invalid input"})
-        return render(request, 'trade.html', content)
+        user_profile = models.UserProfile.objects.get(user=request.user)
 
-    if not models.UserProfile.objects.filter(user=user).exists():
-        trade_logic.create_profile(user)
+        available_stocks = trade_logic.get_number_of_stocks(request.user, stock_info['symbol'])
+        if available_stocks < stock_info['number_of_stocks']:
+            context.update({"error": "Not enough stocks to sell"})
+            return render(request, 'trade.html', context)
 
-    user_profile = models.UserProfile.objects.get(user=user)
+        user_profile.balance += stock_info['total_price']
+        user_profile.save()
 
-    available_stocks = trade_logic.get_number_of_stocks(user, stock_info['symbol'])
-    if available_stocks < stock_info['number_of_stocks']:
-        content.update({"error": "Not enough stocks to sell"})
-        return render(request, 'trade.html', content)
+        stock_info['number_of_stocks'] *= -1
+        trade_logic.create_transaction(request.user, stock_info)
 
-    user_profile.balance += stock_info['total_price']
-    user_profile.save()
+        context.update({'success': f'You have sold {abs(stock_info["number_of_stocks"])} {stock_info["symbol"]} '
+                                   f'for a price {stock_info["total_price"]}'
+                                   f'\n your current balance is: {user_profile.balance}'})
 
-    stock_info['number_of_stocks'] *= -1
-    trade_logic.create_transaction(user, stock_info)
+        return render(request, 'trade.html', context)
 
-    content.update({'success': f'You have sold {abs(stock_info["number_of_stocks"])} {stock_info["symbol"]} '
-                               f'for a price {stock_info["total_price"]}'
-                               f'\n your current balance is: {user_profile.balance}'})
-
-
-
-    return render(request, 'trade.html', content)
+    return render(request, 'trade.html', context)

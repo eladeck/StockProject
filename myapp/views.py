@@ -70,12 +70,13 @@ def my_account(request):
 def update_my_account(request):
     # user_profile = UserProfile.objects.get(user__pk=request.user.id)
     # frm_user_profile = UserProfileForm(request.POST, instance=user_profile)
-    frm_user = UserForm(request.POST, instance=request.user)
-    if frm_user.is_valid():
-        frm_user.save()
-        messages.success(request, 'Profile details updated successfully.')
-    else:
-        messages.error(request, f'error: {frm_user.errors.as_data()}')
+    if request.method == 'POST':
+        frm_user = UserForm(request.POST, instance=request.user)
+        if frm_user.is_valid():
+            frm_user.save()
+            messages.success(request, 'Profile details updated successfully.')
+        else:
+            messages.error(request, f'error: {frm_user.errors.as_data()}')
     return redirect('/accounts/myaccount')
 
 

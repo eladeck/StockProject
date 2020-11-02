@@ -62,10 +62,10 @@
             <tr>
                 <td>{{trans.stock_symbol}}</td>
                 <td>{{trans.trans_date|date:"Y-m-d H:i" }}</td>
-                {% if trans.buy_or_Sell == 0 %}
-                    <td>Buy</td>
-                {% elif  trans.buy_or_Sell == 1  %}
-                    <td>Sell</td>
+                {% if trans.quantity > 0 %}
+                    <td><i class="text-success fa fa-angle-double-left fa-2x"></i></td>
+                {% elif  trans.quantity < 0  %}
+                    <td><i class="text-danger fa fa-angle-double-right fa-2x"></i></td>
                 {% endif %}
                 <td>{{trans.quantity}}</td>
                 <td>{{trans.price}}</td>

@@ -42,3 +42,6 @@ class StockModelTest(TestCase):
         stock = Stock.objects.get(symbol='1')
         max_length = stock._meta.get_field('primary_exchange').max_length
         self.assertEquals(max_length, self.PRIMARY_EXCHANGE_LENGTH)
+
+    def demo_test(self):
+        pass

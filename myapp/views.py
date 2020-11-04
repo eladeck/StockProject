@@ -8,8 +8,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import logout
 from . import stock_api, models
 from datetime import datetime
-from myapp.logic import trade_logic,register_logic
+from myapp.logic import trade_logic, register_logic
 from django.views.decorators.csrf import csrf_exempt
+from myapp.exceptions import custom_exception,trade_excpetions
 
 
 # View for the home page - a list of 20 of the most active stocks
@@ -68,77 +69,46 @@ def compare(request):
 
 
 @login_required
+@csrf_exempt
 def trade(request):
     stock_list = stock_api.get_all_stocks()
-    content = {'stock_list': stock_list}
-    rendered_page = render(request, 'trade.html', content)
-    return rendered_page
-
-
-@login_required
-@csrf_exempt
-def buy(request):
-    stock_list = stock_api.get_all_stocks()
     context = {'stock_list': stock_list}
-    if request.method == 'POST':
-        params = request.POST
+    try:
+        if request.method == 'POST':
+            params = request.POST
+            stock_symbol = params["stock_selector"]
+            number_of_stocks = int(params["number_of_stocks"])
+            if number_of_stocks <= 0:
+                raise trade_excpetions.InvalidNumberOfStocksExceptions("Invalid number")
 
-        stock_info = trade_logic.extract_info(params)
+            stock_price = trade_logic.get_stock_price(stock_symbol)
 
-        if stock_info is None:
-            context.update({"error": "Invalid input"})
+            user_profile = models.UserProfile.objects.get(user=request.user)
+            total_price = stock_price * number_of_stocks
+
+            if 'sell' in params:
+                available_stocks = trade_logic.get_number_of_stocks(request.user, stock_symbol)
+                if available_stocks < number_of_stocks:
+                    raise trade_excpetions.NotEnoughStocksException("Not enough stocks to sell")
+
+                number_of_stocks *= -1
+                trade_logic.create_transaction(request.user, stock_symbol, number_of_stocks, stock_price)
+
+                user_profile.balance += total_price
+                user_profile.save()
+
+            elif 'buy' in params:
+                if total_price > user_profile.balance:
+                    raise trade_excpetions.NotEnoughMoneyException("Not enough money")
+
+                trade_logic.create_transaction(request.user, stock_symbol, number_of_stocks, stock_price)
+
+                user_profile.balance -= total_price
+                user_profile.save()
+
             return render(request, 'trade.html', context)
 
-        user_profile = models.UserProfile.objects.get(user=request.user)
-
-        if stock_info['total_price'] > user_profile.balance:
-            context.update({"error": "not enough balance"})
-            return render(request, 'trade.html', context)
-
-        user_profile.balance -= stock_info['total_price']
-        user_profile.save()
-
-        trade_logic.create_transaction(request.user, stock_info)
-
-        context.update({'success': f'You have bought {stock_info["number_of_stocks"]} {stock_info["symbol"]} '
-                                   f'for a price {stock_info["total_price"]}'
-                                   f'\n your current balance is: {user_profile.balance}'})
-
-        return render(request, 'trade.html', context)
-
-    return render(request, 'trade.html', context)
-
-@login_required
-@csrf_exempt
-def sell(request):
-
-    stock_list = stock_api.get_all_stocks()
-    context = {'stock_list': stock_list}
-    if request.method == 'POST':
-        params = request.POST
-        stock_info = trade_logic.extract_info(params)
-
-        if stock_info is None:
-            context.update({"error": "Invalid input"})
-            return render(request, 'trade.html', context)
-
-        user_profile = models.UserProfile.objects.get(user=request.user)
-
-        available_stocks = trade_logic.get_number_of_stocks(request.user, stock_info['symbol'])
-        if available_stocks < stock_info['number_of_stocks']:
-            context.update({"error": "Not enough stocks to sell"})
-            return render(request, 'trade.html', context)
-
-        user_profile.balance += stock_info['total_price']
-        user_profile.save()
-
-        stock_info['number_of_stocks'] *= -1
-        trade_logic.create_transaction(request.user, stock_info)
-
-        context.update({'success': f'You have sold {abs(stock_info["number_of_stocks"])} {stock_info["symbol"]} '
-                                   f'for a price {stock_info["total_price"]}'
-                                   f'\n your current balance is: {user_profile.balance}'})
-
-        return render(request, 'trade.html', context)
+    except custom_exception.CustomException as e:
+        context.update({'error': str(e)})
 
     return render(request, 'trade.html', context)

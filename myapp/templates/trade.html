@@ -5,7 +5,7 @@
 
 
 
-    <form method="post">
+    <form method="post" action="trade">
         <label for="stock_selector">Stock Symbol</label>
         <select name="stock_selector" id="stock_selector">
             {% for stock in  stock_list %}
@@ -14,16 +14,16 @@
         </select>
         <br>
         <label for="number_of_stocks">Number of Stocks</label>
-        <input type="text" id="number_of_stocks" name="number_of_stocks"><br>
-        <input type="submit" id="buy" name="buy" value="Buy" formaction="buy">
-        <input type="submit" id="sell" name="sell" value="Sell" formaction="sell">
+        <input type="number" id="number_of_stocks" name="number_of_stocks"><br>
+        <input type="submit" id="buy" name="buy" value="Buy">
+        <input type="submit" id="sell" name="sell" value="Sell">
     </form>
 
-    {% if success %}
-        <p>Done! {{ success }}</p>
-    {% endif %}
+
     {% if error %}
         <p>error! {{ error }}</p>
+    {% else %}
+        <p>Operation succeeded</p>
     {% endif %}
 
 

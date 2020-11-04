@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from datetime import datetime
+from django.utils import timezone
 
 
 # Create your models here.
@@ -23,6 +23,6 @@ class Transaction(models.Model):
 	#trans_id (Pk) - comes by Django
 	user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 	stock_symbol = models.CharField(max_length=12)
-	trans_date_time = models.DateTimeField(default=datetime.utcnow())
+	trans_date_time = models.DateTimeField(default=timezone.now)
 	quantity = models.IntegerField()
 	price = models.FloatField()

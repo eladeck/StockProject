@@ -16,8 +16,6 @@ class BaseTest(TestCase):
         self.logout_url = reverse('logout')
         self.compare_url = reverse('compare')
         self.trade_url = reverse('trade')
-        self.buy_url = reverse('buy')
-        self.sell_url = reverse('sell')
         self.user = {
             'firstname': 'Alaa',
             'lastname': 'Yahia',
@@ -132,13 +130,13 @@ class TradeTest(BaseTest):
         self.assertEqual(user1.is_active, True)
         self.client.login(username=self.user['email'], password=self.user['password'])
 
-    def test_access_trade_page_if_logedin(self):
+    def test_access_trade_page_if_loggedin(self):
         self.set_up_trade()
         response = self.client.get(self.trade_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'trade.html')
 
-    def test_access_trade_page_if_not_logedin(self):
+    def test_access_trade_page_if_not_loggedin(self):
         response = self.client.get(self.trade_url, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'login.html')
@@ -147,7 +145,7 @@ class TradeTest(BaseTest):
         self.set_up_trade()
         user = User.objects.filter(email=self.user['email']).first()
         first_balance = user.userprofile.balance
-        response = self.client.post(self.buy_url, {'stock_selector': 'AAPL', 'number_of_stocks': 4}, follow=True)
+        response = self.client.post(self.trade_url, {'buy': 'buy','stock_selector': 'AAPL', 'number_of_stocks': 4}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'trade.html')
         user = User.objects.filter(email=self.user['email']).first()
@@ -160,21 +158,21 @@ class TradeTest(BaseTest):
         self.set_up_trade()
         user = User.objects.filter(email=self.user['email']).first()
         first_balance = user.userprofile.balance
-        response = self.client.post(self.buy_url, {'stock_selector': 'AAPL', 'number_of_stocks': 1000}, follow=True)
+        response = self.client.post(self.trade_url, {'buy': 'buy','stock_selector': 'AAPL', 'number_of_stocks': 1000}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'trade.html')
         user = User.objects.filter(email=self.user['email']).first()
         balance = user.userprofile.balance
         self.assertEquals(first_balance, balance)
-        self.assertEquals(response.context['error'], "not enough balance")
+        self.assertIsNotNone(response.context['error'])
 
     def test_valid_sell(self):
         self.set_up_trade()
         user = User.objects.filter(email=self.user['email']).first()
-        buy_response = self.client.post(self.buy_url, {'stock_selector': 'AAPL', 'number_of_stocks': 4}, follow=True)
+        buy_response = self.client.post(self.trade_url, {'buy':'buy','stock_selector': 'AAPL', 'number_of_stocks': 4}, follow=True)
         self.assertEqual(buy_response.status_code, 200)
         buy_balance = user.userprofile.balance
-        response = self.client.post(self.sell_url, {'stock_selector': 'AAPL', 'number_of_stocks': 3}, follow=True)
+        response = self.client.post(self.trade_url, {'sell':'sell','stock_selector': 'AAPL', 'number_of_stocks': 3}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'trade.html')
         user = User.objects.filter(email=self.user['email']).first()
@@ -188,10 +186,10 @@ class TradeTest(BaseTest):
         self.set_up_trade()
         user = User.objects.filter(email=self.user['email']).first()
         first_balance = user.userprofile.balance
-        response = self.client.post(self.sell_url, {'stock_selector': 'AAPL', 'number_of_stocks': 4}, follow=True)
+        response = self.client.post(self.trade_url, {'sell':'sell','stock_selector': 'AAPL', 'number_of_stocks': 4}, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'trade.html')
         user = User.objects.filter(email=self.user['email']).first()
         balance = user.userprofile.balance
         self.assertEqual(balance, first_balance)
-        self.assertEquals(response.context['error'], "Not enough stocks to sell")
+        self.assertIsNotNone(response.context['error'])

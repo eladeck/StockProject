@@ -51,5 +51,5 @@ def get_stock_historic_prices(symbol, time_range='1m'):
 
 
 def get_all_stocks():
-    return _request_data('/beta/ref-data/symbols')
+    return _request_data('/beta/ref-data/symbols',filter='symbol')
 

@@ -64,7 +64,7 @@ def logout_view(request):
 def my_account(request):
     user = User.objects.get(pk=request.user.id)
     user_profile = UserProfile.objects.get(user__pk=request.user.id)
-    stock_transactions = Transaction.objects.filter(user_id_id=request.user.id)
+    stock_transactions = Transaction.objects.filter(user=request.user)
     frm_user_profile = UserProfileForm(instance=user_profile)
     frm_user = UserForm(instance=user)
     context = {'frm_user': frm_user, 'frm_user_profile': frm_user_profile, 'stock_transactions': stock_transactions}

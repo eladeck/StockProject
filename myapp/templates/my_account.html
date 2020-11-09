@@ -36,7 +36,7 @@
     </div>
     <div class="row-8 my-3 text-right">
         <input class="btn btn-primary" type="submit" value="Save">
-        <button class="btn btn-primary"> Stock Marketing </button>
+        <a href="{% url 'trade' %}" class="btn btn-primary">Stock Trading</a>
     </div>
     {% if messages %}
         {% for message in messages %}
@@ -54,14 +54,15 @@
             <th scope="col">Date</th>
             <th scope="col">Buy/Sell</th>
             <th scope="col">Quantity</th>
-            <th scope="col">Price</th>
+            <th scope="col">Stock Price</th>
+
         </tr>
     </thead>
     <tbody>
         {% for trans in stock_transactions %}
             <tr>
                 <td>{{trans.stock_symbol}}</td>
-                <td>{{trans.trans_date|date:"Y-m-d H:i" }}</td>
+                <td>{{trans.trans_date_time|date:"Y-m-d H:i" }}</td>
                 {% if trans.quantity > 0 %}
                     <td><i class="text-success fa fa-angle-double-left fa-2x"></i></td>
                 {% elif  trans.quantity < 0  %}
@@ -69,6 +70,7 @@
                 {% endif %}
                 <td>{{trans.quantity}}</td>
                 <td>{{trans.price}}</td>
+
             </tr>
         {% endfor %}
     </tbody>

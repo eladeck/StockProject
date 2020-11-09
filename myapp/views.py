@@ -1,3 +1,5 @@
+import requests
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from myapp import stock_api
 from myapp.models import Stock, UserProfile, Transaction
@@ -6,6 +8,12 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import logout,login,authenticate
 from django.contrib import messages
+from django.contrib.auth import logout
+from . import stock_api, models
+from datetime import datetime
+from myapp.logic import trade_logic, register_logic
+from django.views.decorators.csrf import csrf_exempt
+from myapp.exceptions import custom_exception,trade_excpetions
 
 
 # View for the home page - a list of 20 of the most active stocks
@@ -35,17 +43,13 @@ def register(request):
         newuser.last_name = lastname
         newuser.save()
 
-        # initial values for user Profile
-        user_profile = UserProfile()
-        user_profile.user = newuser
-        user_profile.balance = 500
-        user_profile.stocks_num = 0
-        user_profile.save()
+        register_logic.create_profile(newuser)
 
         # to let the user login after registeration
         user = authenticate(username=email, password=password)
         if user is not None:
             login(request, user)
+
         return redirect('index')
     else:
         # If not post (regular request) -> render register page
@@ -86,3 +90,56 @@ def update_my_account(request):
 def single_stock_historic(request, symbol):
     data = stock_api.get_stock_historic_prices(symbol, time_range='1m')
     return JsonResponse({'data': data})
+
+
+def compare(request):
+    stock_list = stock_api.get_all_stocks()
+    data = {'stock_list': stock_list,
+            }
+    return render(request, 'compare_two_stocks.html', data)
+
+
+@login_required
+@csrf_exempt
+def trade(request):
+    stock_list = stock_api.get_all_stocks()
+    context = {'stock_list': stock_list}
+    try:
+        if request.method == 'POST':
+            params = request.POST
+            stock_symbol = params["stock_selector"]
+            number_of_stocks = int(params["number_of_stocks"])
+            if number_of_stocks <= 0:
+                raise trade_excpetions.InvalidNumberOfStocksExceptions("Invalid number")
+
+            stock_price = trade_logic.get_stock_price(stock_symbol)
+
+            user_profile = models.UserProfile.objects.get(user=request.user)
+            total_price = stock_price * number_of_stocks
+
+            if 'sell' in params:
+                available_stocks = trade_logic.get_number_of_stocks(request.user, stock_symbol)
+                if available_stocks < number_of_stocks:
+                    raise trade_excpetions.NotEnoughStocksException("Not enough stocks to sell")
+
+                number_of_stocks *= -1
+                trade_logic.create_transaction(request.user, stock_symbol, number_of_stocks, stock_price)
+
+                user_profile.balance += total_price
+                user_profile.save()
+
+            elif 'buy' in params:
+                if total_price > user_profile.balance:
+                    raise trade_excpetions.NotEnoughMoneyException("Not enough money")
+
+                trade_logic.create_transaction(request.user, stock_symbol, number_of_stocks, stock_price)
+
+                user_profile.balance -= total_price
+                user_profile.save()
+
+            return render(request, 'trade.html', context)
+
+    except custom_exception.CustomException as e:
+        context.update({'error': str(e)})
+
+    return render(request, 'trade.html', context)

@@ -1,1 +1,1 @@
-web: gunicorn myrails.wsgi
+web: gunicorn StockProject.myrails.wsgi

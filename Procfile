@@ -1,1 +1,1 @@
-web: gunicorn myrails:wsgi
+web: gunicorn myrails.wsgi

@@ -16,7 +16,8 @@ class UserForm(forms.ModelForm):
 
 class UserProfileForm(forms.ModelForm):
     balance = forms.DecimalField(disabled=True)
+    money = forms.DecimalField(disabled=True)
 
     class Meta:
         model = UserProfile
-        fields = ['balance']
+        fields = ['balance', 'money']

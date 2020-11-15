@@ -143,3 +143,20 @@ def trade(request):
         context.update({'error': str(e)})
 
     return render(request, 'trade.html', context)
+
+@login_required
+def user_money_view(request):
+    money = 0
+    if request.method == 'GET':
+        user = User.objects.get(pk=request.user.id)
+        user_profile = UserProfile.objects.get(user__pk=request.user.id)
+        stock_transactions = Transaction.objects.filter(user=request.user)
+        money += user_profile.balance
+        for trans in stock_transactions:
+            recent_stock_price = trade_logic.get_stock_price(trans.stock_symbol)
+            money += trans.quantity * recent_stock_price
+        frm_user_profile = UserProfileForm(instance=user_profile)
+        frm_user = UserForm(instance=user)
+        context = {'money': money, 'frm_user': frm_user, 'frm_user_profile': frm_user_profile,
+                   'stock_transactions': stock_transactions}
+        return render(request, 'my_account.html', context=context)

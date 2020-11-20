@@ -170,16 +170,7 @@ def user_money_view(request):
 
         balance = user_profile.balance
         balance = '%.1f' % round(balance, 1)
-
-        user = User.objects.get(pk=request.user.id)
-        user_profile = UserProfile.objects.get(user__pk=request.user.id)
-        stock_transactions = Transaction.objects.filter(user=request.user)
-        frm_user_profile = UserProfileForm(instance=user_profile)
-        frm_user = UserForm(instance=user)
-
-
-        context = {'frm_user': frm_user, 'frm_user_profile': frm_user_profile, 'stock_transactions': stock_transactions,
-                   'balance':balance ,'money': total_money, "stocks_data": stocks_data}
-        return render(request, 'my_account.html', context=context)
+        context = {'balance':balance ,'money': total_money, "stocks_data": stocks_data}
+        return render(request, 'user_money.html', context=context)
     else:
         return redirect('/accounts/myaccount')

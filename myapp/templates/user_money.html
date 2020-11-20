@@ -5,10 +5,13 @@
 {% csrf_token %}
 
 
+
+
+
 <div>
-    <h1> Your stocks and balance worth: {{ money }}</h1>
-    <h2> Yor balance is: {{ balance}}</h2>
-    <h2> Yor current stocks:</h2>
+    <h2> Your stocks and balance worth: {{ money }}</h2>
+    <h2> Your balance is: {{ balance}}</h2>
+    <h2> Your current stocks:</h2>
 
 
 <table class="table table-striped">
@@ -17,6 +20,7 @@
             <th scope="col">Stock</th>
             <th scope="col">Quantity</th>
             <th scope="col">Stock Recent Price</th>
+            <th scope="col">Total Stock Price</th>
 
         </tr>
     </thead>
@@ -26,7 +30,7 @@
                 <td>{{stock_symbol}}</td>
                 <td>{{data.quantity}}</td>
                 <td>{{data.current_price}}</td>
-
+                <td >{{data.total_stock_price}}</td>
             </tr>
         {% endfor %}
     </tbody>

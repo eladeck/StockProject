@@ -148,10 +148,8 @@ def trade(request):
 def user_money_view(request):
     total_money = 0
     if request.method == 'GET':
-        user = User.objects.get(pk=request.user.id)
         user_profile = UserProfile.objects.get(user__pk=request.user.id)
         stock_transactions = Transaction.objects.filter(user=request.user)
-        #stock_data = {"sympol": "", "quantity": 0, "current_price": 0}
         stocks_data = {}
 
         for trans in stock_transactions:
@@ -162,13 +160,17 @@ def user_money_view(request):
                 stock_data["quantity"] = trans.quantity
                 stocks_data[trans.stock_symbol] = stock_data
             else:
-               stocks_data[trans.stock_symbol]["quantity"] += trans.quantity
+                stocks_data[trans.stock_symbol]["quantity"] += trans.quantity
 
         total_money += user_profile.balance
+        total_money = round(total_money,3)
         for stock,data in stocks_data.items():
-            total_money += data["quantity"] * data["current_price"]
+            data["total_stock_price"] = data["quantity"] * data["current_price"]
+            total_money += data["total_stock_price"]
 
-        #frm_user_profile = UserProfileForm(instance=user_profile)
-        #frm_user = UserForm(instance=user)
-        context = {'balance': user_profile.balance,'money': total_money, "stocks_data": stocks_data}
+        balance = user_profile.balance
+        balance = '%.1f' % round(balance, 1)
+        context = {'balance':balance ,'money': total_money, "stocks_data": stocks_data}
         return render(request, 'user_money.html', context=context)
+    else:
+        return redirect('/accounts/myaccount')

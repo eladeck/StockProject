@@ -45,6 +45,35 @@
     {% endif %}
 </form>
 
+<div class = "align-items-start">
+    <h3> Your stocks and balance worth: {{ money }}</h3>
+    <h3> Your balance is: {{ balance}}</h3>
+    <h3> Your current stocks:</h3>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Stock</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Stock Recent Price</th>
+            <th scope="col">Total Stock Price</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock_symbol, data in stocks_data.items %}
+            <tr>
+                <td>{{stock_symbol}}</td>
+                <td>{{data.quantity}}</td>
+                <td>{{data.current_price}}</td>
+                <td >{{data.total_stock_price}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
 <table class="table table-striped">
     <thead>
         <tr>

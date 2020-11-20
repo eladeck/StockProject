@@ -27,6 +27,36 @@
     {% endif %}
 
 
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Stock</th>
+            <th scope="col">Date</th>
+            <th scope="col">Buy/Sell</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Stock Price</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% for trans in stock_transactions %}
+            <tr>
+                <td>{{trans.stock_symbol}}</td>
+                <td>{{trans.trans_date_time|date:"Y-m-d H:i" }}</td>
+                {% if trans.quantity > 0 %}
+                    <td><i class="text-success fa fa-angle-double-left fa-2x"></i></td>
+                {% elif  trans.quantity < 0  %}
+                    <td><i class="text-danger fa fa-angle-double-right fa-2x"></i></td>
+                {% endif %}
+                <td>{{trans.quantity}}</td>
+                <td>{{trans.price}}</td>
+
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
 {% endblock %}
 
 {% block scripts %}

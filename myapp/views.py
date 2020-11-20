@@ -103,7 +103,8 @@ def compare(request):
 @csrf_exempt
 def trade(request):
     stock_list = stock_api.get_all_stocks()
-    context = {'stock_list': stock_list}
+    stock_transactions = Transaction.objects.filter(user=request.user)
+    context = {'stock_list': stock_list, 'stock_transactions': stock_transactions}
     try:
         if request.method == 'POST':
             params = request.POST

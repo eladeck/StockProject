@@ -40,12 +40,7 @@ function myFunction() {
             {{frm_user.last_name}}
         </div>
     </div>
-<!--    <div class="row-8 my-3 ">-->
-<!--        <div class="d-flex flex-column align-items-start  col-6 ">-->
-<!--            {{frm_user.email.label_tag}}-->
-<!--            {{frm_user.email}}-->
-<!--        </div>-->
-<!--    </div>-->
+
     <div class="row-8 my-3 text-right">
         <input class="btn btn-primary" type="submit" value="Save">
         <a href="{% url 'trade' %}" class="btn btn-primary">Stock Trading</a>
@@ -60,40 +55,6 @@ function myFunction() {
         {% endfor %}
     {% endif %}
 </form>
-<div class="row-8 my-3 text-right">
-        <button id="button" class="btn btn-primary" onclick="myFunction()" >Show Trading History</button>
-</div>
-
-<div id = "history-table" style="display:none">
-<table  class="table table-striped" >
-    <thead>
-        <tr>
-            <th scope="col">Stock</th>
-            <th scope="col">Date</th>
-            <th scope="col">Buy/Sell</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Stock Price</th>
-
-        </tr>
-    </thead>
-    <tbody>
-        {% for trans in stock_transactions %}
-            <tr>
-                <td>{{trans.stock_symbol}}</td>
-                <td>{{trans.trans_date_time|date:"Y-m-d H:i" }}</td>
-                {% if trans.quantity > 0 %}
-                    <td><i class="text-success fa fa-angle-double-left fa-2x"></i></td>
-                {% elif  trans.quantity < 0  %}
-                    <td><i class="text-danger fa fa-angle-double-right fa-2x"></i></td>
-                {% endif %}
-                <td>{{trans.quantity}}</td>
-                <td>{{trans.price}}</td>
-
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-</div>
 
 
 {% endblock %}

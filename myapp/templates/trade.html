@@ -3,7 +3,19 @@
 
 {% block content %}
 
-
+<script>
+function myFunction() {
+  var x = document.getElementById("history-table");
+      if (x.style.display !== "none") {
+        x.style.display = "none";
+      } else {
+        x.style.display = "block";
+      }
+  var elem = document.getElementById("button");
+      if (elem.innerText === "Show Trading History") elem.innerText = "Hide Trading History";
+      else elem.innerText = "Show Trading History";
+}
+</script>
 
     <form method="post" action="{% url 'trade' %}">
         <label for="stock_selector">Stock Symbol</label>
@@ -26,8 +38,12 @@
         <p>Operation succeeded</p>
     {% endif %}
 
+<div class="row-8 my-3 text-right">
+        <button id="button" class="btn btn-primary" onclick="myFunction()" >Show Trading History</button>
+</div>
 
-<table class="table table-striped">
+<div id = "history-table" style="display:none">
+<table  class="table table-striped" >
     <thead>
         <tr>
             <th scope="col">Stock</th>
@@ -55,6 +71,7 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 
 
 {% endblock %}

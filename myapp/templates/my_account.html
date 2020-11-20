@@ -28,18 +28,8 @@
             {{frm_user.email}}
         </div>
     </div>
-    <div class="row-8 my-3">
-        <div class="col-4 d-flex flex-column align-items-start   ">
-            {{frm_user_profile.balance.label_tag}}
-            {{frm_user_profile.balance}}
-        </div>
-    </div>
-    <div class="row-8 my-3">
-        <div class="col-4 d-flex flex-column align-items-start   ">
-            {{frm_user_profile.money.label_tag}}
-            {{ money }}
-        </div>
-    </div>
+
+
     <div class="row-8 my-3 text-right">
         <input class="btn btn-primary" type="submit" value="Save">
         <a href="{% url 'trade' %}" class="btn btn-primary">Stock Trading</a>

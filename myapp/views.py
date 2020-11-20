@@ -146,17 +146,29 @@ def trade(request):
 
 @login_required
 def user_money_view(request):
-    money = 0
+    total_money = 0
     if request.method == 'GET':
         user = User.objects.get(pk=request.user.id)
         user_profile = UserProfile.objects.get(user__pk=request.user.id)
         stock_transactions = Transaction.objects.filter(user=request.user)
-        money += user_profile.balance
+        #stock_data = {"sympol": "", "quantity": 0, "current_price": 0}
+        stocks_data = {}
+
         for trans in stock_transactions:
-            recent_stock_price = trade_logic.get_stock_price(trans.stock_symbol)
-            money += trans.quantity * recent_stock_price
-        frm_user_profile = UserProfileForm(instance=user_profile)
-        frm_user = UserForm(instance=user)
-        context = {'money': money, 'frm_user': frm_user, 'frm_user_profile': frm_user_profile,
-                   'stock_transactions': stock_transactions}
-        return render(request, 'my_account.html', context=context)
+            if trans.stock_symbol not in stocks_data:
+                stock_data = {}
+                recent_stock_price = trade_logic.get_stock_price(trans.stock_symbol)
+                stock_data["current_price"] = recent_stock_price
+                stock_data["quantity"] = trans.quantity
+                stocks_data[trans.stock_symbol] = stock_data
+            else:
+               stocks_data[trans.stock_symbol]["quantity"] += trans.quantity
+
+        total_money += user_profile.balance
+        for stock,data in stocks_data.items():
+            total_money += data["quantity"] * data["current_price"]
+
+        #frm_user_profile = UserProfileForm(instance=user_profile)
+        #frm_user = UserForm(instance=user)
+        context = {'balance': user_profile.balance,'money': total_money, "stocks_data": stocks_data}
+        return render(request, 'user_money.html', context=context)

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% csrf_token %}
+
+
+<div>
+    <h1> Your stocks and balance worth: {{ money }}</h1>
+    <h2> Yor balance is: {{ balance}}</h2>
+    <h2> Yor current stocks:</h2>
+
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Stock</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Stock Recent Price</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock_symbol, data in stocks_data.items %}
+            <tr>
+                <td>{{stock_symbol}}</td>
+                <td>{{data.quantity}}</td>
+                <td>{{data.current_price}}</td>
+
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+
+
+
+
+{% endblock %}

@@ -4,18 +4,6 @@
 
 {% csrf_token %}
 
-
-<script>
-function myFunction() {
-  var x = document.getElementById("money-table");
-      if (x.style.display !== "none") {
-        x.style.display = "none";
-      } else {
-        x.style.display = "block";
-      }
-}
-</script>
-
 <form action="updatemyaccount" method="post">
     {% csrf_token %}
     <div class="row-8 my-3 ">
@@ -45,8 +33,7 @@ function myFunction() {
     <div class="row-8 my-3 text-right">
         <input class="btn btn-primary" type="submit" value="Save">
         <a href="{% url 'trade' %}" class="btn btn-primary">Stock Trading</a>
-        <a href="{% url 'money' %}" id="button" class="btn btn-primary" onclick="myFunction()">Show Amount Of Money</a>
-
+        <a href="{% url 'money' %}" class="btn btn-primary">Show Amount Of Money</a>
     </div>
 
     {% if messages %}
@@ -58,8 +45,6 @@ function myFunction() {
     {% endif %}
 </form>
 
-
-<div id = "money-table">
 <div class = "align-items-start">
     <h3> Your stocks and balance worth: {{ money }}</h3>
     <h3> Your balance is: {{ balance}}</h3>
@@ -87,11 +72,6 @@ function myFunction() {
         {% endfor %}
     </tbody>
 </table>
-</div>
-
-
-
-
 
 </div>
 <table class="table table-striped">

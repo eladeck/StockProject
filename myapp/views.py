@@ -19,8 +19,8 @@ from myapp.exceptions import custom_exception,trade_excpetions
 # View for the home page - a list of 20 of the most active stocks
 def index(request):
     # Query the stock table, filter for top ranked stocks and order by their rank.
-    data = Stock.objects.filter(top_rank__isnull=False).order_by('top_rank')
-    return render(request, 'index.html', {'page_title': 'Main', 'data': data})
+    top_stocks = stock_api._get_top_stocks()
+    return render(request, 'index.html', {'page_title': 'Main', 'data': top_stocks})
 
 
 # View for the single stock page

@@ -1,3 +1,4 @@
+import logging
 from itertools import chain
 
 import requests
@@ -50,6 +51,8 @@ def register(request):
 
         register_logic.create_profile(newuser)
 
+        logger = logging.getLogger('custom_log')
+        logger.debug(f'{newuser.first_name}  {newuser.last_name} rigestered .')
         # to let the user login after registeration
         user = authenticate(username=email, password=password)
         if user is not None:

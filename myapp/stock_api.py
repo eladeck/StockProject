@@ -1,5 +1,5 @@
 import requests
-
+from django.core.cache import cache
 # Sandbox API - FOR TESTING
 BASE_URL = 'https://sandbox.iexapis.com'
 PUBLIC_TOKEN = 'Tpk_c818732500c24764801eb121fa658bb6'
@@ -26,10 +26,13 @@ def _request_data(url, filter='', additional_parameters={}):
 	if filter:
 		query_strings['filter'] = filter
 
-	response = requests.get(final_url, params=query_strings)
+	response = cache.get(url)
+	if not response:
+		response = requests.get(final_url, params=query_strings)
+		if not response.ok:
+			raise Exception('Unexpected response: ', response.__dict__)
+		cache.set(url, response, 60*10)
 
-	if not response.ok:
-		raise Exception('Unexpected response: ', response.__dict__)
 	return response.json()
 
 
@@ -51,5 +54,5 @@ def get_stock_historic_prices(symbol, time_range='1m'):
 
 
 def get_all_stocks():
-    return _request_data('/beta/ref-data/symbols')
+    return _request_data('/beta/ref-data/symbols',filter='symbol')
 

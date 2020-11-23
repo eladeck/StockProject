@@ -3,6 +3,8 @@
 import os
 #import django_heroku
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import django_heroku
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -114,7 +116,11 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'myapp/static')
 ]
 
-#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+if os.getcwd() == '/app':
+    DEBUG = False
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+    django_heroku.settings(locals())
 
 LOGIN_URL = '/accounts/login'
 LOGIN_REDIRECT_URL = '/'
@@ -127,4 +133,4 @@ CACHES = {
     }
 }
 
-#django_heroku.settings(locals())
+

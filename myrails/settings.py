@@ -105,7 +105,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+STATIC_URL = '/static/'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
@@ -115,7 +115,6 @@ if os.getcwd() == '/app':
     django_heroku.settings(locals())
 else:
     DEBUG = True
-    STATIC_URL = '/static/'
 
     STATICFILES_DIRS = [
         os.path.join(BASE_DIR, 'myapp/static')

@@ -9,6 +9,9 @@ urlpatterns = [
 	path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
 	path('accounts/logout/', views.logout_view, name='logout'),
 	path('accounts/register/', views.register, name='register'),
-	path('trade', views.trade, name='trade'),
-	path('compare', views.compare, name='compare')
+	path('accounts/myaccount/',views.my_account,name='my_account'),
+	path('accounts/myaccount/updatemyaccount',views.update_my_account,name ='update_my_account'),
+	path('accounts/myaccount/money',views.user_money_view,name ='money'),
+	path('trade/', views.trade, name='trade'),
+	path('compare/', views.compare, name='compare')
 ]

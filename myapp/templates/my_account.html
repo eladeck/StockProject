@@ -40,25 +40,19 @@ function myFunction() {
             {{frm_user.last_name}}
         </div>
     </div>
-    <div class="row-8 my-3 ">
-        <div class="d-flex flex-column align-items-start  col-6 ">
-            {{frm_user.email.label_tag}}
-            {{frm_user.email}}
-        </div>
-    </div>
 
 
     <div class="row-8 my-3 text-right">
         <input class="btn btn-primary" type="submit" value="Save">
         <a href="{% url 'trade' %}" class="btn btn-primary">Stock Trading</a>
-        <a href="{% url 'money' %}" class="btn btn-primary">Show Amount Of Money</a>
+        <a href="{% url 'money' %}" class="btn btn-primary">Show Balance</a>
     </div>
 
     {% if messages %}
         {% for message in messages %}
             {% if message.tags %}
                 <div class="alert alert-success" role="alert">{{ message }}</div>
-            {% endif %}>
+            {% endif %}
         {% endfor %}
     {% endif %}
 </form>

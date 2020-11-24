@@ -145,6 +145,10 @@ def trade(request):
 
     return render(request, 'trade.html', context)
 
+
+def stock_info(request, symbol):
+    return JsonResponse({'price': stock_api.get_stock_info(symbol)['latestPrice']})
+
 @login_required
 def user_money_view(request):
     total_money = 0

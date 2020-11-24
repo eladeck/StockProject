@@ -19,8 +19,8 @@ from myapp.exceptions import custom_exception,trade_excpetions
 # View for the home page - a list of 20 of the most active stocks
 def index(request):
     # Query the stock table, filter for top ranked stocks and order by their rank.
-    data = Stock.objects.filter(top_rank__isnull=False).order_by('top_rank')
-    return render(request, 'index.html', {'page_title': 'Main', 'data': data})
+    top_stocks = stock_api._get_top_stocks()
+    return render(request, 'index.html', {'page_title': 'Main', 'data': top_stocks})
 
 
 # View for the single stock page
@@ -103,7 +103,8 @@ def compare(request):
 @csrf_exempt
 def trade(request):
     stock_list = stock_api.get_all_stocks()
-    context = {'stock_list': stock_list}
+    stock_transactions = Transaction.objects.filter(user=request.user)
+    context = {'stock_list': stock_list, 'stock_transactions': stock_transactions}
     try:
         if request.method == 'POST':
             params = request.POST
@@ -147,3 +148,34 @@ def trade(request):
 
 def stock_info(request, symbol):
     return JsonResponse({'price': stock_api.get_stock_info(symbol)['latestPrice']})
+
+@login_required
+def user_money_view(request):
+    total_money = 0
+    if request.method == 'GET':
+        user_profile = UserProfile.objects.get(user__pk=request.user.id)
+        stock_transactions = Transaction.objects.filter(user=request.user)
+        stocks_data = {}
+
+        for trans in stock_transactions:
+            if trans.stock_symbol not in stocks_data:
+                stock_data = {}
+                recent_stock_price = trade_logic.get_stock_price(trans.stock_symbol)
+                stock_data["current_price"] = recent_stock_price
+                stock_data["quantity"] = trans.quantity
+                stocks_data[trans.stock_symbol] = stock_data
+            else:
+                stocks_data[trans.stock_symbol]["quantity"] += trans.quantity
+
+        total_money += user_profile.balance
+        total_money = round(total_money,3)
+        for stock,data in stocks_data.items():
+            data["total_stock_price"] = data["quantity"] * data["current_price"]
+            total_money += data["total_stock_price"]
+
+        balance = user_profile.balance
+        balance = '%.1f' % round(balance, 1)
+        context = {'balance':balance ,'money': total_money, "stocks_data": stocks_data}
+        return render(request, 'user_money.html', context=context)
+    else:
+        return redirect('/accounts/myaccount')

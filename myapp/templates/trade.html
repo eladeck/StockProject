@@ -3,33 +3,6 @@
 
 {% block content %}
 
-<script>
-function myFunction() {
-  var x = document.getElementById("history-table");
-      if (x.style.display !== "none") {
-        x.style.display = "none";
-      } else {
-        x.style.display = "block";
-      }
-  var elem = document.getElementById("button");
-      if (elem.innerText === "Show Trading History") elem.innerText = "Hide Trading History";
-      else elem.innerText = "Show Trading History";
-}
-</script>
-
-    <form method="post" action="{% url 'trade' %}">
-        <label for="stock_selector">Stock Symbol</label>
-        <select name="stock_selector" id="stock_selector">
-            {% for stock in  stock_list %}
-                <option value="{{ stock.symbol }}">{{ stock.symbol }}</option>
-            {% endfor %}
-        </select>
-        <br>
-        <label for="number_of_stocks">Number of Stocks</label>
-        <input type="number" id="number_of_stocks" name="number_of_stocks"><br>
-        <input type="submit" id="buy" name="buy" value="Buy">
-        <input type="submit" id="sell" name="sell" value="Sell">
-    </form>
 
 <form method="post" action="{% url 'trade' %}">
     <label for="stock_selector">Stock Symbol</label>
@@ -59,6 +32,7 @@ function myFunction() {
 <div class="row-8 my-3 text-right">
         <button id="button" class="btn btn-primary" onclick="myFunction()" >Show Trading History</button>
 </div>
+
 
 <div id = "history-table" style="display:none">
 <table  class="table table-striped" >
@@ -91,13 +65,13 @@ function myFunction() {
 </table>
 </div>
 
-<canvas id="stockChart" height="100" ></canvas>
+<canvas id="stockChart"></canvas>
+
 
 {% endblock %}
 
 {% block scripts %}
 <script>
-
 
  function get_stock_price() {
     draw_figure()
@@ -132,8 +106,8 @@ get_stock_price()
 
 
                         var ctxL = document.getElementById("stockChart").getContext('2d');
+                        ctxL.height = 80
                         ctxL.width = 100
-                        ctxL.height = 100
 
                         myLineChart = new Chart(ctxL, {
                             type: 'line',
@@ -153,15 +127,26 @@ get_stock_price()
                                     }
 
                                 ]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false
                             }
 
                         });
                 });
         }
+
+
+
+function myFunction() {
+  var x = document.getElementById("history-table");
+      if (x.style.display !== "none") {
+        x.style.display = "none";
+      } else {
+        x.style.display = "block";
+      }
+  var elem = document.getElementById("button");
+      if (elem.innerText === "Show Trading History") elem.innerText = "Hide Trading History";
+      else elem.innerText = "Show Trading History";
+}
+
 
 </script>
 

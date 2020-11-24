@@ -143,3 +143,34 @@ def trade(request):
         context.update({'error': str(e)})
 
     return render(request, 'trade.html', context)
+
+@login_required
+def user_money_view(request):
+    total_money = 0
+    if request.method == 'GET':
+        user_profile = UserProfile.objects.get(user__pk=request.user.id)
+        stock_transactions = Transaction.objects.filter(user=request.user)
+        stocks_data = {}
+
+        for trans in stock_transactions:
+            if trans.stock_symbol not in stocks_data:
+                stock_data = {}
+                recent_stock_price = trade_logic.get_stock_price(trans.stock_symbol)
+                stock_data["current_price"] = recent_stock_price
+                stock_data["quantity"] = trans.quantity
+                stocks_data[trans.stock_symbol] = stock_data
+            else:
+                stocks_data[trans.stock_symbol]["quantity"] += trans.quantity
+
+        total_money += user_profile.balance
+        total_money = round(total_money,3)
+        for stock,data in stocks_data.items():
+            data["total_stock_price"] = data["quantity"] * data["current_price"]
+            total_money += data["total_stock_price"]
+
+        balance = user_profile.balance
+        balance = '%.1f' % round(balance, 1)
+        context = {'balance':balance ,'money': total_money, "stocks_data": stocks_data}
+        return render(request, 'user_money.html', context=context)
+    else:
+        return redirect('/accounts/myaccount')

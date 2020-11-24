@@ -16,6 +16,7 @@ class BaseTest(TestCase):
         self.logout_url = reverse('logout')
         self.compare_url = reverse('compare')
         self.trade_url = reverse('trade')
+        self.money_url = reverse('money')
         self.user = {
             'firstname': 'Alaa',
             'lastname': 'Yahia',
@@ -193,3 +194,35 @@ class TradeTest(BaseTest):
         balance = user.userprofile.balance
         self.assertEqual(balance, first_balance)
         self.assertIsNotNone(response.context['error'])
+
+class UserMoneyTest(BaseTest):
+    # mabey should move to set_up
+    def set_up_user_login(self):
+        self.client.post(self.register_url, self.user, format='text/html')
+        res = self.client.post(self.login_url, self.user, format='text/html')
+        self.assertTemplateUsed(res, 'login.html')
+        user1 = User.objects.filter(email=self.user['email']).first()
+        self.assertEqual(user1.is_active, True)
+        self.client.login(username=self.user['email'], password=self.user['password'])
+
+    def test_access_money_page_if_loggedin(self):
+        self.set_up_user_login()
+        response = self.client.get(self.money_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'user_money.html')
+
+    def test_access_money_page_if_not_loggedin(self):
+        response = self.client.get(self.money_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'base.html')
+
+    def test_post_request_if_loggedin(self):
+        self.set_up_user_login()
+        response = self.client.post(self.money_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'my_account.html')
+
+    def test_post_request_if_not_loggedin(self):
+        response = self.client.post(self.money_url, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'base.html')

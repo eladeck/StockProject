@@ -143,3 +143,7 @@ def trade(request):
         context.update({'error': str(e)})
 
     return render(request, 'trade.html', context)
+
+
+def stock_info(request, symbol):
+    return JsonResponse({'price': stock_api.get_stock_info(symbol)['latestPrice']})

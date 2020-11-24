@@ -3,7 +3,19 @@
 
 {% block content %}
 
-
+<script>
+function myFunction() {
+  var x = document.getElementById("history-table");
+      if (x.style.display !== "none") {
+        x.style.display = "none";
+      } else {
+        x.style.display = "block";
+      }
+  var elem = document.getElementById("button");
+      if (elem.innerText === "Show Trading History") elem.innerText = "Hide Trading History";
+      else elem.innerText = "Show Trading History";
+}
+</script>
 
     <form method="post" action="{% url 'trade' %}">
         <label for="stock_selector">Stock Symbol</label>
@@ -25,6 +37,41 @@
     {% else %}
         <p>Operation succeeded</p>
     {% endif %}
+
+<div class="row-8 my-3 text-right">
+        <button id="button" class="btn btn-primary" onclick="myFunction()" >Show Trading History</button>
+</div>
+
+<div id = "history-table" style="display:none">
+<table  class="table table-striped" >
+    <thead>
+        <tr>
+            <th scope="col">Stock</th>
+            <th scope="col">Date</th>
+            <th scope="col">Buy/Sell</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Stock Price</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% for trans in stock_transactions %}
+            <tr>
+                <td>{{trans.stock_symbol}}</td>
+                <td>{{trans.trans_date_time|date:"Y-m-d H:i" }}</td>
+                {% if trans.quantity > 0 %}
+                    <td><i class="text-success fa fa-angle-double-left fa-2x"></i></td>
+                {% elif  trans.quantity < 0  %}
+                    <td><i class="text-danger fa fa-angle-double-right fa-2x"></i></td>
+                {% endif %}
+                <td>{{trans.quantity}}</td>
+                <td>{{trans.price}}</td>
+
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
 
 
 {% endblock %}

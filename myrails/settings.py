@@ -3,6 +3,8 @@
 import os
 #import django_heroku
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import django_heroku
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -13,7 +15,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '!sq5o3kstxfaxw&%nq9*t63^q!cr_-4l7#b-nb*5@zv2b$9eut'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = ['stocksrails.herokuapp.com', 'localhost', '127.0.0.1']
 
@@ -34,6 +35,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -108,13 +110,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+DEBUG=True
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'myapp/static')
-]
-
-#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+# django_heroku.settings(locals())
 
 LOGIN_URL = '/accounts/login'
 LOGIN_REDIRECT_URL = '/'
@@ -127,4 +135,4 @@ CACHES = {
     }
 }
 
-#django_heroku.settings(locals())
+
